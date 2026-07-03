@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/home")
 @Tag(name = "Welcome API", description = "Operations related to WZelcome Management")
 public class WelcomeController {
