@@ -1,0 +1,130 @@
+application.properties
+----------------
+spring.profiles.active=dev
+
+application-prod.properties
+-------------------
+
+# ===============================
+# Server Configuration
+# ===============================
+server.port=${PORT:8080}
+
+# ===============================
+# Application Name
+# ===============================
+spring.application.name=SpringBootCRUD
+
+# ===============================
+# MySQL Database Configuration
+# ===============================
+spring.datasource.url=jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=${MYSQLUSER}
+spring.datasource.password=${MYSQLPASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# ===============================
+# JPA / Hibernate Configuration
+# ===============================
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+
+# ===============================
+# SQL Logging
+# ===============================
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+logging.level.org.hibernate.SQL=INFO
+logging.level.org.hibernate.orm.jdbc.bind=INFO
+
+# ===============================
+# Connection Pool (HikariCP)
+# ===============================
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.idle-timeout=30000
+spring.datasource.hikari.max-lifetime=1800000
+spring.datasource.hikari.connection-timeout=30000
+
+# ===============================
+# Graceful Shutdown
+# ===============================
+server.shutdown=graceful
+spring.lifecycle.timeout-per-shutdown-phase=30s
+
+IN render 
+---------
+Variable	Value
+MYSQLHOST	your-railway-host.railway.app
+MYSQLPORT	3306
+MYSQLDATABASE	railway (or your database name)
+MYSQLUSER	root (or your database user)
+MYSQLPASSWORD	your-password
+SPRING_PROFILES_ACTIVE	prod
+
+
+
+
+also
+
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+
+Render will automatically 
+
+SPRING_DATASOURCE_URL=jdbc:mysql://your-host:3306/railway?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=your-password
+
+
+Dockerfile
+----------------
+# ===============================
+# Stage 1 - Build the application
+# ===============================
+FROM maven:3.9.9-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+# Copy pom.xml first
+COPY pom.xml .
+
+# Download dependencies
+RUN mvn dependency:go-offline
+
+# Copy project source
+COPY src ./src
+
+# Build the project
+RUN mvn clean package -DskipTests
+
+# ===============================
+# Stage 2 - Run the application
+# ===============================
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copy generated jar
+COPY --from=build /app/target/*.jar app.jar
+
+# Spring Boot Port
+EXPOSE 8080
+
+# Start Application
+ENTRYPOINT ["java","-jar","app.jar"]
+
+.dockerignore
+-------------
+
+target/
+.git/
+.idea/
+.settings/
+.classpath
+.project
+.vscode/
+*.log
