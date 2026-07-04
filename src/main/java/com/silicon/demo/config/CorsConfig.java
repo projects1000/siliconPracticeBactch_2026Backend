@@ -19,7 +19,7 @@ public class CorsConfig {
         config.setAllowCredentials(true);
 
         config.setAllowedOriginPatterns(Arrays.asList(
-                "https://playschool-a2z.netlify.app",
+                "https://magenta-fudge-0dcc9e.netlify.app/",
                 "http://localhost:4200"
         ));
 
