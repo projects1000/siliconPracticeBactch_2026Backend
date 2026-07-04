@@ -116,3 +116,17 @@ target/
 .project
 .vscode/
 *.log
+
+
+
+
+
+
+----
+
+docker settings
+commit in git 
+deply in rendersetup db postgress
+
+set the properties file 
+
